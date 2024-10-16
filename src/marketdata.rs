@@ -48,10 +48,10 @@ pub struct MarketData {
 }
 
 impl MarketData {
-    pub fn isin(&self) -> Cow<'_,str> {
+    pub fn isin(&self) -> Cow<'_, str> {
         String::from_utf8_lossy(&self.issue_code)
     }
-    pub fn data_type(&self) -> Cow<'_,str>{
+    pub fn data_type(&self) -> Cow<'_, str> {
         String::from_utf8_lossy(&self.data_type)
     }
 }
@@ -112,8 +112,8 @@ fn parse_market_data_from_clean_bytes() {
 
 #[test]
 fn try_from_for_full_udp() {
-    let fulludp = [
-        1u8, 0, 94, 37, 54, 61, 0, 18, 68, 200, 56, 10, 8, 0, 69, 0, 0, 243, 11, 241, 0, 0, 59, 17,
+    let full_udp_packet_found_in_example_files: &[u8] = &[
+        1, 0, 94, 37, 54, 61, 0, 18, 68, 200, 56, 10, 8, 0, 69, 0, 0, 243, 11, 241, 0, 0, 59, 17,
         145, 136, 192, 166, 1, 120, 233, 37, 54, 61, 141, 203, 60, 155, 0, 223, 40, 57, 66, 54, 48,
         51, 52, 75, 82, 52, 50, 48, 49, 70, 51, 50, 55, 50, 49, 48, 48, 50, 52, 48, 48, 48, 50, 48,
         55, 48, 54, 48, 48, 49, 52, 50, 48, 48, 48, 48, 48, 48, 53, 48, 48, 49, 52, 49, 48, 48, 48,
@@ -127,6 +127,6 @@ fn try_from_for_full_udp() {
         50, 57, 57, 55, 255,
     ];
 
-    let md: Result<MarketData, _> = fulludp.try_into();
+    let md: Result<MarketData, _> = full_udp_packet_found_in_example_files.try_into();
     assert!(md.is_ok())
 }
