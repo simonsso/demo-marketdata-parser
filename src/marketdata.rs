@@ -94,7 +94,6 @@ impl MarketData {
     );
 
     impl_market_data_accessors!(issue_code, quote_accept_time);
-
 }
 #[derive(thiserror::Error, Debug)]
 pub enum MDError {

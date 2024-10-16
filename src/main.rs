@@ -10,6 +10,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = config::Config::parse();
     let file = File::open(config.dump_file)?;
     let mut reader = LegacyPcapReader::new(65536, file)?;
+    let mut sortmap: Vec<(String, String)> = vec![];
 
     loop {
         match reader.next() {
@@ -48,7 +49,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 md.best_ask_quantity_5(),
                                 md.best_ask_price_5()
                             );
-                            println!("{s}");
+                            if config.sort_on_accepted_time {
+                                sortmap.push((md.quote_accept_time().to_string(), s));
+                            } else {
+                                println!("{s}");
+                            }
                         }
                     }
                     PcapBlockOwned::NG(_) => unreachable!(),
@@ -60,6 +65,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 reader.refill().unwrap();
             }
             Err(e) => panic!("error while reading: {:?}", e),
+        }
+    }
+    if config.sort_on_accepted_time {
+        sortmap.sort_by_key(|s| s.0.clone());
+        for s in sortmap {
+            println!("{}", s.1);
         }
     }
     Ok(())
