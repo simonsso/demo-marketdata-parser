@@ -22,17 +22,33 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             // Should print:
                             // <pkt-time> <accept-time> <issue-code> <bqty5>@<bprice5> ... <bqty1>@<bprice1> <aqty1>@<aprice1> ... <aqty5>@<aprice5>
 
-                            println!(
-                                "{} {} {} {}@{} {}@{}",
+                            let s = format!(
+                                "{} {} {} {}@{} {}@{} {}@{} {}@{} {}@{} {}@{} {}@{} {}@{} {}@{} {}@{}",
                                 pkt_time,
                                 md.quote_accept_time(),
                                 md.issue_code(),
-                                md.best_bid_price_5(),
                                 md.best_bid_quantity_5(),
-                                md.best_bid_price_4(),
+                                md.best_bid_price_5(),
                                 md.best_bid_quantity_4(),
-
-                            )
+                                md.best_bid_price_4(),
+                                md.best_bid_quantity_3(),
+                                md.best_bid_price_3(),
+                                md.best_bid_quantity_2(),
+                                md.best_bid_price_2(),
+                                md.best_bid_quantity_1(),
+                                md.best_bid_price_1(),
+                                md.best_ask_quantity_1(),
+                                md.best_ask_price_1(),
+                                md.best_ask_quantity_2(),
+                                md.best_ask_price_2(),
+                                md.best_ask_quantity_3(),
+                                md.best_ask_price_3(),
+                                md.best_ask_quantity_4(),
+                                md.best_ask_price_4(),
+                                md.best_ask_quantity_5(),
+                                md.best_ask_price_5()
+                            );
+                            println!("{s}");
                         }
                     }
                     PcapBlockOwned::NG(_) => unreachable!(),
