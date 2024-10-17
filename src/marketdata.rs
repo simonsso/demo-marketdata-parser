@@ -46,18 +46,18 @@ pub struct MarketData {
     pub end_of_message: u8,                  // 0xff
 }
 
+// Getter functions for String fields
 macro_rules! impl_market_data_accessors {
     ($($field:ident),*) => {
-
         $(
             pub fn $field(&self) -> std::borrow::Cow<'_, str> {
                 String::from_utf8_lossy(&self.$field)
             }
         )*
-
     }
 }
 
+// Getter functions for decimal fields, 7 digit numbers fits well in an u32
 macro_rules! impl_market_data_decimal {
     ($($field:ident),*) => {
         $(
@@ -65,7 +65,6 @@ macro_rules! impl_market_data_decimal {
                 String::from_utf8_lossy(&self.$field).parse::<u32>().unwrap_or_default()
             }
         )*
-
     }
 }
 

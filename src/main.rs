@@ -18,7 +18,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 match block {
                     PcapBlockOwned::LegacyHeader(_hdr) => {}
                     PcapBlockOwned::Legacy(b) => {
-                        let pkt_time = b.ts_usec;
+                        let pkt_time = (b.ts_sec as u64) << 32 | b.ts_usec as u64;  // Todo: check how this field is defined and should be handled
                         if let Ok(md) = MarketData::try_from(b.data) {
                             // Should print:
                             // <pkt-time> <accept-time> <issue-code> <bqty5>@<bprice5> ... <bqty1>@<bprice1> <aqty1>@<aprice1> ... <aqty5>@<aprice5>
