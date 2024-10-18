@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 pub struct MarketDataPacket {
     pub quote_accept_time: u32,
     pub pkt_time: u64,
-    marketstring: String,
+    marketdata: MarketData,
 }
 
 impl MarketDataPacket {
@@ -22,41 +22,40 @@ impl MarketDataPacket {
             .parse::<u32>()
             .unwrap_or_default();
 
-        let marketstring = format!(
-            "{} {} {} {}@{} {}@{} {}@{} {}@{} {}@{} {}@{} {}@{} {}@{} {}@{} {}@{}",
-            pkt_time,
-            marketdata.quote_accept_time(),
-            marketdata.issue_code(),
-            marketdata.best_bid_quantity_5(),
-            marketdata.best_bid_price_5(),
-            marketdata.best_bid_quantity_4(),
-            marketdata.best_bid_price_4(),
-            marketdata.best_bid_quantity_3(),
-            marketdata.best_bid_price_3(),
-            marketdata.best_bid_quantity_2(),
-            marketdata.best_bid_price_2(),
-            marketdata.best_bid_quantity_1(),
-            marketdata.best_bid_price_1(),
-            marketdata.best_ask_quantity_1(),
-            marketdata.best_ask_price_1(),
-            marketdata.best_ask_quantity_2(),
-            marketdata.best_ask_price_2(),
-            marketdata.best_ask_quantity_3(),
-            marketdata.best_ask_price_3(),
-            marketdata.best_ask_quantity_4(),
-            marketdata.best_ask_price_4(),
-            marketdata.best_ask_quantity_5(),
-            marketdata.best_ask_price_5()
-        );
         MarketDataPacket {
             pkt_time,
             quote_accept_time,
-            marketstring,
+            marketdata,
         }
     }
 
-    pub fn get_quote_data(&self) -> &str {
-        &self.marketstring
+    pub fn get_quote_data(&self) -> String {
+        format!(
+            "{} {} {} {}@{} {}@{} {}@{} {}@{} {}@{} {}@{} {}@{} {}@{} {}@{} {}@{}",
+            self.pkt_time,
+            self.marketdata.quote_accept_time(),
+            self.marketdata.issue_code(),
+            self.marketdata.best_bid_quantity_5(),
+            self.marketdata.best_bid_price_5(),
+            self.marketdata.best_bid_quantity_4(),
+            self.marketdata.best_bid_price_4(),
+            self.marketdata.best_bid_quantity_3(),
+            self.marketdata.best_bid_price_3(),
+            self.marketdata.best_bid_quantity_2(),
+            self.marketdata.best_bid_price_2(),
+            self.marketdata.best_bid_quantity_1(),
+            self.marketdata.best_bid_price_1(),
+            self.marketdata.best_ask_quantity_1(),
+            self.marketdata.best_ask_price_1(),
+            self.marketdata.best_ask_quantity_2(),
+            self.marketdata.best_ask_price_2(),
+            self.marketdata.best_ask_quantity_3(),
+            self.marketdata.best_ask_price_3(),
+            self.marketdata.best_ask_quantity_4(),
+            self.marketdata.best_ask_price_4(),
+            self.marketdata.best_ask_quantity_5(),
+            self.marketdata.best_ask_price_5()
+        )
     }
 }
 
