@@ -1,6 +1,50 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, Debug,PartialEq, Eq, PartialOrd, Ord)]
+pub struct MarketDataPacket {
+    quote_accept_time: u32,
+    pub pkt_time: u64,
+    marketdata: MarketData,
+}
+
+impl MarketDataPacket {
+    pub fn new(pkt_time:u64,marketdata:MarketData) -> Self {
+        let quote_accept_time= marketdata.quote_accept_time().parse::<u32>().unwrap_or_default();
+
+        MarketDataPacket{pkt_time,quote_accept_time,marketdata}
+    }
+
+    pub fn get_quote_data(&self) -> String {
+        format!(
+            "{} {} {} {}@{} {}@{} {}@{} {}@{} {}@{} {}@{} {}@{} {}@{} {}@{} {}@{}",
+            self.pkt_time,
+            self.marketdata.quote_accept_time(),
+            self.marketdata.issue_code(),
+            self.marketdata.best_bid_quantity_5(),
+            self.marketdata.best_bid_price_5(),
+            self.marketdata.best_bid_quantity_4(),
+            self.marketdata.best_bid_price_4(),
+            self.marketdata.best_bid_quantity_3(),
+            self.marketdata.best_bid_price_3(),
+            self.marketdata.best_bid_quantity_2(),
+            self.marketdata.best_bid_price_2(),
+            self.marketdata.best_bid_quantity_1(),
+            self.marketdata.best_bid_price_1(),
+            self.marketdata.best_ask_quantity_1(),
+            self.marketdata.best_ask_price_1(),
+            self.marketdata.best_ask_quantity_2(),
+            self.marketdata.best_ask_price_2(),
+            self.marketdata.best_ask_quantity_3(),
+            self.marketdata.best_ask_price_3(),
+            self.marketdata.best_ask_quantity_4(),
+            self.marketdata.best_ask_price_4(),
+            self.marketdata.best_ask_quantity_5(),
+            self.marketdata.best_ask_price_5()
+        )
+    }
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub struct MarketData {
     data_type: [u8; 2],                  // B6
     information_type: [u8; 2],           // 03
