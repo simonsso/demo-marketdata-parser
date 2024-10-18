@@ -1,14 +1,14 @@
-use marketdata::{MarketData,MarketDataPacket};
+use marketdata::{MarketData, MarketDataPacket};
 use pcap_parser::traits::PcapReaderIterator;
 use pcap_parser::*;
-use std::collections::{BTreeSet, VecDeque};
+use std::collections::VecDeque;
 use std::fs::File;
 
 mod config;
 mod marketdata;
 use clap::Parser;
 
-const THREE_SECONDS:u64 = 3<<32;
+const THREE_SECONDS: u64 = 3 << 32;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = config::Config::parse();
@@ -26,32 +26,31 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             // Should print:
                             // <pkt-time> <accept-time> <issue-code> <bqty5>@<bprice5> ... <bqty1>@<bprice1> <aqty1>@<aprice1> ... <aqty5>@<aprice5>
 
-                            let pkt_time = b.ts_usec as u64 +( (b.ts_sec as u64) << 32);
-                            let market_data_packet = MarketDataPacket::new(pkt_time ,md);
-                            
+                            let pkt_time = b.ts_usec as u64 + ((b.ts_sec as u64) << 32);
+                            let market_data_packet = MarketDataPacket::new(pkt_time, md);
+
                             if config.sort_on_accepted_time {
                                 let quote_accept_time = market_data_packet.quote_accept_time;
-                                let pos = sortmap.binary_search_by(|x|  x.quote_accept_time.cmp(&quote_accept_time) );
+                                let pos = sortmap
+                                    .binary_search_by(|x| x.raw_cmp((quote_accept_time, pkt_time)));
 
                                 let pos = match pos {
                                     Ok(p) => p,
-                                    Err(p) => p
+                                    Err(p) => p,
                                 };
                                 sortmap.insert(pos, market_data_packet);
 
                                 while let Some(x) = sortmap.front() {
-                                    
                                     if x.pkt_time + THREE_SECONDS < pkt_time {
-                                        if let Some(mdp) = sortmap.pop_front()  {
-                                            println!("{}",mdp.get_quote_data());
+                                        if let Some(mdp) = sortmap.pop_front() {
+                                            println!("{}", mdp.get_quote_data());
                                         }
-                                    }else {
+                                    } else {
                                         break;
                                     }
                                 }
-                                // println!("===========================================================================================")
                             } else {
-                                println!("{}",market_data_packet.get_quote_data());
+                                println!("{}", market_data_packet.get_quote_data());
                             }
                         }
                     }

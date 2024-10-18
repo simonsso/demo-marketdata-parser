@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug,PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct MarketDataPacket {
     pub quote_accept_time: u32,
     pub pkt_time: u64,
@@ -8,10 +8,25 @@ pub struct MarketDataPacket {
 }
 
 impl MarketDataPacket {
-    pub fn new(pkt_time:u64,marketdata:MarketData) -> Self {
-        let quote_accept_time= marketdata.quote_accept_time().parse::<u32>().unwrap_or_default();
+    pub fn raw_cmp(&self, other: (u32, u64)) -> std::cmp::Ordering {
+        match self.quote_accept_time.cmp(&other.0) {
+            core::cmp::Ordering::Equal => {}
+            ord => return ord,
+        }
+        self.pkt_time.cmp(&other.1)
+    }
 
-        MarketDataPacket{pkt_time,quote_accept_time,marketdata}
+    pub fn new(pkt_time: u64, marketdata: MarketData) -> Self {
+        let quote_accept_time = marketdata
+            .quote_accept_time()
+            .parse::<u32>()
+            .unwrap_or_default();
+
+        MarketDataPacket {
+            pkt_time,
+            quote_accept_time,
+            marketdata,
+        }
     }
 
     pub fn get_quote_data(&self) -> String {
