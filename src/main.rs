@@ -10,7 +10,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = config::Config::parse();
     let file = File::open(config.dump_file)?;
     let mut reader = LegacyPcapReader::new(65536, file)?;
-    let mut sortmap: Vec<(String, String)> = vec![];
+    let mut sortmap: Vec<(u32, String)> = vec![];
 
     loop {
         match reader.next() {
@@ -50,7 +50,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 md.best_ask_price_5()
                             );
                             if config.sort_on_accepted_time {
-                                sortmap.push((md.quote_accept_time().to_string(), s));
+                                let qat = md.quote_accept_time().parse::<u32>().unwrap_or_default();
+                                sortmap.push((qat, s));
                             } else {
                                 println!("{s}");
                             }
