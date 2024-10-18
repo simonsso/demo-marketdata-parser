@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug,PartialEq, Eq, PartialOrd, Ord)]
 pub struct MarketDataPacket {
-    quote_accept_time: u32,
+    pub quote_accept_time: u32,
     pub pkt_time: u64,
     marketdata: MarketData,
 }

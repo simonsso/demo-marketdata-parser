@@ -1,7 +1,7 @@
 use marketdata::{MarketData,MarketDataPacket};
 use pcap_parser::traits::PcapReaderIterator;
 use pcap_parser::*;
-use std::collections::BTreeSet;
+use std::collections::{BTreeSet, VecDeque};
 use std::fs::File;
 
 mod config;
@@ -14,7 +14,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = config::Config::parse();
     let file = File::open(config.dump_file)?;
     let mut reader = LegacyPcapReader::new(65536, file)?;
-    let mut sortmap: BTreeSet<MarketDataPacket> = BTreeSet::new();
+    let mut sortmap: VecDeque<MarketDataPacket> = VecDeque::new();
 
     loop {
         match reader.next() {
@@ -30,12 +30,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             let market_data_packet = MarketDataPacket::new(pkt_time ,md);
                             
                             if config.sort_on_accepted_time {
-                                sortmap.insert(market_data_packet);
+                                let quote_accept_time = market_data_packet.quote_accept_time;
+                                let pos = sortmap.binary_search_by(|x|  x.quote_accept_time.cmp(&quote_accept_time) );
 
-                                while let Some(x) = sortmap.first() {
+                                let pos = match pos {
+                                    Ok(p) => p,
+                                    Err(p) => p
+                                };
+                                sortmap.insert(pos, market_data_packet);
+
+                                while let Some(x) = sortmap.front() {
                                     
                                     if x.pkt_time + THREE_SECONDS < pkt_time {
-                                        if let Some(mdp) = sortmap.pop_first()  {
+                                        if let Some(mdp) = sortmap.pop_front()  {
                                             println!("{}",mdp.get_quote_data());
                                         }
                                     }else {
